@@ -1,4 +1,4 @@
-FROM rasputinlabs/base-php:0.1
+FROM rasputinlabs/base-php:0.2
 MAINTAINER David Ramsington <grokbot.dwr@gmail.com>
 
 # Set some Environment variables + Build Arguments
@@ -14,7 +14,9 @@ RUN apt-get install -y -qq \
 COPY conf/* /tmp/conf/
 
 # Install Composer + rewrite APP_HOST variable + make the entrypoint executable + clean up our mess + move files to appropriate locations
-RUN curl -sS https://getcomposer.org/installer | php && \
+RUN docker-php-ext-install pdo pdo_mysql mysqli && \
+    docker-php-ext-enable opcache && \
+    curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer && \
     envsubst \$APP_HOST < /tmp/conf/vhost.conf > /etc/nginx/conf.d/vhost.conf && \
     mv /tmp/conf/nginx.conf /etc/nginx/nginx.conf && \
